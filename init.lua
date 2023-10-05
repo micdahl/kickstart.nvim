@@ -11,7 +11,7 @@ Kickstart.nvim is a template for your own configuration.
   what your configuration is doing, and modify it to suit your needs.
 
   Once you've done that, you should start exploring, configuring and tinkering to
-  explore Neovim!
+  tokyonightexplore Neovim!
 
   If you don't know anything about Lua, I recommend taking some time to read through
   a guide. One possible example:
@@ -42,6 +42,8 @@ P.S. You can delete this when you're done too. It's your config now :)
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+
+vim.env.RUFF_EXPERIMENTAL_FORMATTER = 1
 
 -- Install package manager
 --    https://github.com/folke/lazy.nvim
@@ -106,8 +108,16 @@ require('lazy').setup({
 
       -- Adds a number of user-friendly snippets
       'rafamadriz/friendly-snippets',
+      'mstuttgart/vscode-odoo-snippets',
+      'SaimonL/vsc-rspec'
     },
   },
+
+  { 'christoomey/vim-tmux-navigator' },
+  { 'github/copilot.vim' },
+  { 'mbbill/undotree' },
+  { 'tpope/vim-dispatch' },
+  { 'tpope/vim-surround' },
 
   -- Useful plugin to show you pending keybinds.
   { 'folke/which-key.nvim', opts = {} },
@@ -143,12 +153,19 @@ require('lazy').setup({
   },
 
   {
-    -- Theme inspired by Atom
-    'navarasu/onedark.nvim',
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme 'onedark'
-    end,
+	  'folke/tokyonight.nvim',
+    opts = {
+      transparent = true,
+      dim_inactive = true,
+      on_highlights = function(hl, c)
+        hl.LineNr = {
+                bg = c.blue0
+            }
+        hl.StatusLine = {
+                bg = c.blue0
+            }
+      end
+    }
   },
 
   {
@@ -157,8 +174,8 @@ require('lazy').setup({
     -- See `:help lualine.txt`
     opts = {
       options = {
-        icons_enabled = false,
-        theme = 'onedark',
+        icons_enabled = true,
+        theme = 'auto',
         component_separators = '|',
         section_separators = '',
       },
@@ -186,6 +203,7 @@ require('lazy').setup({
       -- Fuzzy Finder Algorithm which requires local dependencies to be built.
       -- Only load if `make` is available. Make sure you have the system
       -- requirements installed.
+      'nvim-telescope/telescope-live-grep-args.nvim',
       {
         'nvim-telescope/telescope-fzf-native.nvim',
         -- NOTE: If you are having trouble with this installation,
@@ -196,6 +214,9 @@ require('lazy').setup({
         end,
       },
     },
+    config = function()
+      require("telescope").load_extension("live_grep_args")
+    end
   },
 
   {
@@ -238,13 +259,16 @@ vim.o.mouse = 'a'
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
 --  See `:help 'clipboard'`
-vim.o.clipboard = 'unnamedplus'
+-- vim.o.clipboard = 'unnamedplus'
 
 -- Enable break indent
 vim.o.breakindent = true
 
 -- Save undo history
+vim.opt.swapfile = false
 vim.o.undofile = true
+vim.opt.backup = false
+vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
 
 -- Case-insensitive searching UNLESS \C or capital in search
 vim.o.ignorecase = true
@@ -260,6 +284,16 @@ vim.o.timeoutlen = 300
 -- Set completeopt to have a better completion experience
 vim.o.completeopt = 'menuone,noselect'
 
+vim.opt.nu = true
+vim.opt.relativenumber = true
+
+vim.opt.tabstop = 4
+vim.opt.softtabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.expandtab = true
+
+vim.opt.smartindent = true
+
 -- NOTE: You should make sure your terminal supports this
 vim.o.termguicolors = true
 
@@ -268,6 +302,8 @@ vim.o.termguicolors = true
 -- Keymaps for better default experience
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
+vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
+vim.keymap.set("n", "<leader>gs", vim.cmd.Git)
 
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -315,7 +351,7 @@ vim.keymap.set('n', '<leader>gf', require('telescope.builtin').git_files, { desc
 vim.keymap.set('n', '<leader>sf', require('telescope.builtin').find_files, { desc = '[S]earch [F]iles' })
 vim.keymap.set('n', '<leader>sh', require('telescope.builtin').help_tags, { desc = '[S]earch [H]elp' })
 vim.keymap.set('n', '<leader>sw', require('telescope.builtin').grep_string, { desc = '[S]earch current [W]ord' })
-vim.keymap.set('n', '<leader>sg', require('telescope.builtin').live_grep, { desc = '[S]earch by [G]rep' })
+vim.keymap.set('n', '<leader>sg', require('telescope').extensions.live_grep_args.live_grep_args, { desc = '[S]earch by [G]rep' })
 vim.keymap.set('n', '<leader>sd', require('telescope.builtin').diagnostics, { desc = '[S]earch [D]iagnostics' })
 vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = '[S]earch [R]esume' })
 
@@ -325,13 +361,13 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim' },
+    ensure_installed = { 'c', 'cpp', 'elixir', 'javascript', 'go', 'lua', 'python', 'ruby', 'rust', 'typescript', 'vim' },
   
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
   
     highlight = { enable = true },
-    indent = { enable = true },
+    indent = { enable = true, disable= { 'python', 'ruby' } },
     incremental_selection = {
       enable = true,
       keymaps = {
@@ -464,7 +500,8 @@ local servers = {
   -- pyright = {},
   -- rust_analyzer = {},
   -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
+  html = { filetypes = { 'html', 'twig', 'hbs'} },
+  elixirls = {},
 
   lua_ls = {
     Lua = {
@@ -472,6 +509,7 @@ local servers = {
       telemetry = { enable = false },
     },
   },
+  ruff_lsp = {},
 }
 
 -- Setup neovim lua configuration
@@ -546,6 +584,10 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
+
+vim.cmd[[colorscheme tokyonight-night]]
+vim.g.copilot_no_tab_map = true
+vim.api.nvim_set_keymap("i", "<C-J>", 'copilot#Accept("<CR>")', { silent = true, expr = true })
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
