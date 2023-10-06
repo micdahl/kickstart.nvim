@@ -11,7 +11,7 @@ Kickstart.nvim is a template for your own configuration.
   what your configuration is doing, and modify it to suit your needs.
 
   Once you've done that, you should start exploring, configuring and tinkering to
-  tokyonightexplore Neovim!
+  explore Neovim!
 
   If you don't know anything about Lua, I recommend taking some time to read through
   a guide. One possible example:
@@ -164,6 +164,9 @@ require('lazy').setup({
         hl.StatusLine = {
                 bg = c.blue0
             }
+      end,
+      on_colors = function(colors)
+        colors.comment = "#7f7f7f"
       end
     }
   },
@@ -175,7 +178,7 @@ require('lazy').setup({
     opts = {
       options = {
         icons_enabled = true,
-        theme = 'auto',
+        theme = 'tokyonight',
         component_separators = '|',
         section_separators = '',
       },
