@@ -523,7 +523,7 @@ require('which-key').register({
 local servers = {
   -- clangd = {},
   -- gopls = {},
-  -- pyright = {},
+  pyright = {},
   -- rust_analyzer = {},
   html = { filetypes = { 'html', 'twig', 'hbs' } },
   elixirls = {},
