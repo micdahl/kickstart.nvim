@@ -535,6 +535,7 @@ local servers = {
     },
   },
   ruff_lsp = {},
+  ruby_ls = {},
   tsserver = {},
 }
 
