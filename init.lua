@@ -344,9 +344,12 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 require('telescope').setup {
   defaults = {
     mappings = {
+      n = {
+        ['<C-d>'] = require('telescope.actions').delete_buffer,
+      },
       i = {
         ['<C-u>'] = false,
-        ['<C-d>'] = false,
+        ['<C-d>'] = require('telescope.actions').delete_buffer,
       },
     },
   },
@@ -386,7 +389,7 @@ vim.keymap.set('n', '<leader>sr', require('telescope.builtin').resume, { desc = 
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'elixir', 'javascript', 'go', 'lua', 'python', 'ruby', 'rust',
+    ensure_installed = { 'c', 'cpp', 'eex', 'elixir', 'heex', 'javascript', 'go', 'lua', 'python', 'ruby', 'rust',
       'typescript', 'vim', 'xml' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
@@ -619,6 +622,7 @@ vim.api.nvim_set_keymap("i", "<C-J>", 'copilot#Accept("<CR>")', { silent = true,
 vim.o.grepprg = "rg --vimgrep --no-heading --smart-case"
 vim.o.grepformat = "%f:%l:%c:%m"
 
+vim.g.loaded_python3_provider = 0
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
 -- The line beneath this is called `modeline`. See `:help modeline`
