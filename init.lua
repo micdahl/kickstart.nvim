@@ -90,8 +90,10 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+vim.env.RUFF_EXPERIMENTAL_FORMATTER = 1
+
 -- Set to true if you have a Nerd Font installed
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -102,7 +104,7 @@ vim.g.have_nerd_font = false
 vim.opt.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.opt.relativenumber = true
+vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
@@ -303,6 +305,10 @@ require('lazy').setup({
     branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
+      -- Fuzzy Finder Algorithm which requires local dependencies to be built.
+      -- Only load if `make` is available. Make sure you have the system
+      -- requirements installed.
+      'nvim-telescope/telescope-live-grep-args.nvim',
       { -- If encountering errors, see telescope-fzf-native README for installation instructions
         'nvim-telescope/telescope-fzf-native.nvim',
 
@@ -363,6 +369,7 @@ require('lazy').setup({
       -- Enable Telescope extensions if they are installed
       pcall(require('telescope').load_extension, 'fzf')
       pcall(require('telescope').load_extension, 'ui-select')
+      pcall(require('telescope').load_extension, 'live_grep_args')
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
@@ -501,6 +508,11 @@ require('lazy').setup({
           --  For example, in C this would take you to the header.
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
+          map('<leader>pv', vim.cmd.Ex, '[P]ath [V]iew')
+          vim.keymap.set('n', '<leader>gs', vim.cmd.Git, { desc = '[G]it [S]tatus' })
+          vim.keymap.set({ 'n', 'v' }, '<leader>y', [["+y]], { buffer = event.buf, desc = 'LSP: ' .. '[Y]ank to clipboard' })
+          map('<leader>Y', [["+Y]], '[Y]ank to clipboard (line)')
+
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
           --    See `:help CursorHold` for information about when this is executed
@@ -540,7 +552,7 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -550,6 +562,10 @@ require('lazy').setup({
         -- But for many setups, the LSP (`tsserver`) will work just fine
         -- tsserver = {},
         --
+        html = { filetypes = { 'html', 'twig', 'hbs' } },
+        elixirls = {},
+        lemminx = {},
+        ruby_ls = {},
 
         lua_ls = {
           -- cmd = {...},
@@ -645,7 +661,8 @@ require('lazy').setup({
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
           -- {
-          --   'rafamadriz/friendly-snippets',
+          'rafamadriz/friendly-snippets',
+          'mstuttgart/vscode-odoo-snippets',
           --   config = function()
           --     require('luasnip.loaders.from_vscode').lazy_load()
           --   end,
@@ -735,6 +752,24 @@ require('lazy').setup({
     --
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     'folke/tokyonight.nvim',
+    opts = {
+      transparent = true,
+      dim_inactive = true,
+      on_highlights = function(hl, c)
+        hl.LineNr = {
+          bg = c.blue0,
+        }
+        hl.StatusLine = {
+          bg = c.blue0,
+        }
+        hl.DiagnosticUnnecessary = {
+          fg = c.blue1,
+        }
+      end,
+      on_colors = function(colors)
+        colors.comment = '#7f7f7f'
+      end,
+    },
     priority = 1000, -- Make sure to load this before all the other start plugins.
     init = function()
       -- Load the colorscheme here.
@@ -818,6 +853,12 @@ require('lazy').setup({
     end,
   },
 
+  { 'christoomey/vim-tmux-navigator' },
+  { 'github/copilot.vim', lazy = false },
+  { 'mbbill/undotree' },
+  { 'tpope/vim-fugitive' },
+  { 'tpope/vim-dispatch' },
+
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -859,5 +900,12 @@ require('lazy').setup({
   },
 })
 
+vim.g.copilot_no_tab_map = true
+vim.api.nvim_set_keymap('i', '<C-J>', 'copilot#Accept("<CR>")', { silent = true, expr = true })
+
+vim.o.grepprg = 'rg --vimgrep --no-heading --smart-case'
+vim.o.grepformat = '%f:%l:%c:%m'
+
+vim.g.loaded_python3_provider = 0
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
