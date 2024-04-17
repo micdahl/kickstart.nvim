@@ -668,14 +668,25 @@ require('lazy').setup({
       --    See the README about individual language/framework/plugin snippets:
       --    https://github.com/rafamadriz/friendly-snippets
       'rafamadriz/friendly-snippets',
-      'mstuttgart/vscode-odoo-snippets',
     },
     config = function()
       -- See `:help cmp`
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
-      luasnip.config.setup {}
+      luasnip.config.setup {
+        history = true,
+        updateevents = 'TextChanged,TextChangedI',
+        enable_autosnippets = true,
+        ext_opts = {
+          [require('luasnip.util.types').choiceNode] = {
+            active = {
+              virt_text = { { '•', 'MatchParen' } },
+            },
+          },
+        },
+      }
       require('luasnip.loaders.from_vscode').lazy_load()
+      require('luasnip.loaders.from_lua').lazy_load { paths = '~/.config/nvim/snippets' }
 
       cmp.setup {
         snippet = {
@@ -728,6 +739,11 @@ require('lazy').setup({
             end
           end, { 'i', 's' }),
 
+          ['<C-e>'] = cmp.mapping(function()
+            if luasnip.choice_active() then
+              luasnip.change_choice(1)
+            end
+          end, { 'i', 's' }),
           -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
           --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
@@ -852,6 +868,7 @@ require('lazy').setup({
   { 'mbbill/undotree' },
   { 'tpope/vim-fugitive' },
   { 'tpope/vim-dispatch' },
+  { 'odoo.nvim', dev = true, lazy = false },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
@@ -871,8 +888,11 @@ require('lazy').setup({
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
 }, {
+  dev = {
+    path = '/home/michael/projects/neovim',
+  },
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
     -- default lazy.nvim defined Nerd Font icons, otherwise define a unicode icons table
