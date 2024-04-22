@@ -668,6 +668,12 @@ require('lazy').setup({
       --    See the README about individual language/framework/plugin snippets:
       --    https://github.com/rafamadriz/friendly-snippets
       'rafamadriz/friendly-snippets',
+      {
+        'zbirenbaum/copilot-cmp',
+        config = function()
+          require('copilot_cmp').setup()
+        end,
+      },
     },
     config = function()
       -- See `:help cmp`
@@ -686,7 +692,7 @@ require('lazy').setup({
         },
       }
       require('luasnip.loaders.from_vscode').lazy_load()
-      require('luasnip.loaders.from_lua').lazy_load { paths = '~/.config/nvim/snippets' }
+      require('luasnip.loaders.from_lua').lazy_load { paths = { '~/.config/nvim/snippets' } }
 
       cmp.setup {
         snippet = {
@@ -695,6 +701,22 @@ require('lazy').setup({
           end,
         },
         completion = { completeopt = 'menu,menuone,noinsert' },
+
+        sorting = {
+          priority_weight = 2,
+          comparators = {
+            require('copilot_cmp.comparators').prioritize,
+            cmp.config.compare.offset,
+            cmp.config.compare.exact,
+            cmp.config.compare.score,
+            cmp.config.compare.recently_used,
+            cmp.config.compare.locality,
+            cmp.config.compare.kind,
+            cmp.config.compare.sort_text,
+            cmp.config.compare.length,
+            cmp.config.compare.order,
+          },
+        },
 
         -- For an understanding of why these mappings were
         -- chosen, you will need to read `:help ins-completion`
@@ -748,6 +770,7 @@ require('lazy').setup({
           --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
         sources = {
+          { name = 'copilot' },
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
@@ -864,10 +887,21 @@ require('lazy').setup({
   },
 
   { 'christoomey/vim-tmux-navigator' },
-  { 'github/copilot.vim', lazy = false },
   { 'mbbill/undotree' },
   { 'tpope/vim-fugitive' },
   { 'tpope/vim-dispatch' },
+  {
+    'zbirenbaum/copilot.lua',
+    cmd = 'Copilot',
+    event = 'InsertEnter',
+    config = function()
+      require('copilot').setup {
+        suggestion = { enabled = false },
+        panel = { enabled = false },
+      }
+    end,
+  },
+
   { 'odoo.nvim', dev = true, lazy = false },
 
   -- The following two comments only work if you have downloaded the kickstart repo, not just copy pasted the
@@ -913,9 +947,6 @@ require('lazy').setup({
     },
   },
 })
-
-vim.g.copilot_no_tab_map = true
-vim.api.nvim_set_keymap('i', '<C-J>', 'copilot#Accept("<CR>")', { silent = true, expr = true })
 
 vim.o.grepprg = 'rg --vimgrep --no-heading --smart-case'
 vim.o.grepformat = '%f:%l:%c:%m'
