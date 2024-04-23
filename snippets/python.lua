@@ -399,4 +399,87 @@ table.insert(
     i(0, 'pass'),
   })
 )
+
+table.insert(
+  snippets,
+  s({ trig = 'ofconstrains', name = 'field constrains method', desc = 'constrains for a specific field' }, {
+    t '@api.constrains("',
+    i(1, 'field_name'),
+    t { '")', 'def _constrains_' },
+    rep(1),
+    t { '(self):', '    for record in self:', '        ' },
+    i(0, 'if record.name == record.description: raise ValidationError("Fields name and description must be different")'),
+  })
+)
+
+table.insert(
+  snippets,
+  s(
+    { trig = 'oocreate', name = 'Create', desc = 'Overwrite the create method' },
+    fmt(
+      [[
+    @api.model_create_multi
+    def create(self, vals):
+        res = super().create(vals)
+        {finish}
+        return res
+    ]],
+      { finish = i(0) }
+    )
+  )
+)
+
+table.insert(
+  snippets,
+  s(
+    { trig = 'oowrite', name = 'Write', desc = 'Overwrite the write method' },
+    fmt(
+      [[
+    def write(self, vals):
+        res = super().write(vals)
+        {finish}
+        return res
+    ]],
+      { finish = i(0) }
+    )
+  )
+)
+
+table.insert(
+  snippets,
+  s(
+    { trig = 'oounlink', name = 'Unlink', desc = 'Overwrite the unlink method' },
+    fmt(
+      [[
+    def unlink(self):
+        res = super().unlink()
+        {finish}
+        return res
+    ]],
+      { finish = i(0) }
+    )
+  )
+)
+
+table.insert(
+  snippets,
+  s({ trig = 'oattr', name = 'Odoo Model Attribute' }, {
+    c(1, {
+      sn(nil, { t '_description = ', i(1, '"Model Description"') }),
+      sn(nil, { t '_sql_constraints = [', i(1, '("field_name_unique", "UNIQUE (field_name)", _("The field must be unique!"))'), t ']' }),
+      sn(nil, { t '_order = ', i(1, '"id"') }),
+      sn(nil, { t '_rec_name = ', i(1, '"name"') }),
+      sn(nil, { t '_fold_name = ', i(1, '"field_to_fold"') }),
+      sn(nil, { t '_auto = ', i(1, 'True') }),
+      sn(nil, { t '_log_access = ', i(1, 'True') }),
+      sn(nil, { t '_table = ', i(1, 'None') }),
+      sn(nil, { t '_register = ', i(1, 'False') }),
+      sn(nil, { t '_inherits = {', t({}, { '    ' }), i(1, '"a.model": "a_field_id"'), t '}' }),
+      sn(nil, { t '_check_company_auto = ', i(1, 'False') }),
+      sn(nil, { t '_parent_name = ', i(1, '"parent_id"') }),
+      sn(nil, { t '_parent_store = ', i(1, 'False') }),
+    }),
+  })
+)
+
 return snippets, autosnippets
