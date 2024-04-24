@@ -155,6 +155,7 @@ table.insert(
       [[
 from odoo import _, api, fields, models
 
+
 class {className}(models.{modelType}):
     {newOrInherit} = "{modelName}"
 
@@ -465,18 +466,18 @@ table.insert(
   snippets,
   s({ trig = 'oattr', name = 'Odoo Model Attribute' }, {
     c(1, {
-      sn(nil, { t '_description = ', i(1, '"Model Description"') }),
+      sn(nil, { t '_description = "', i(1, 'Model Description'), t '"' }),
       sn(nil, { t '_sql_constraints = [', i(1, '("field_name_unique", "UNIQUE (field_name)", _("The field must be unique!"))'), t ']' }),
-      sn(nil, { t '_order = ', i(1, '"id"') }),
-      sn(nil, { t '_rec_name = ', i(1, '"name"') }),
-      sn(nil, { t '_fold_name = ', i(1, '"field_to_fold"') }),
+      sn(nil, { t '_order = "', i(1, 'id'), t '"' }),
+      sn(nil, { t '_rec_name = "', i(1, 'name'), t '"' }),
+      sn(nil, { t '_fold_name = "', i(1, 'field_to_fold'), t '"' }),
       sn(nil, { t '_auto = ', i(1, 'True') }),
       sn(nil, { t '_log_access = ', i(1, 'True') }),
       sn(nil, { t '_table = ', i(1, 'None') }),
       sn(nil, { t '_register = ', i(1, 'False') }),
       sn(nil, { t '_inherits = {', t({}, { '    ' }), i(1, '"a.model": "a_field_id"'), t '}' }),
       sn(nil, { t '_check_company_auto = ', i(1, 'False') }),
-      sn(nil, { t '_parent_name = ', i(1, '"parent_id"') }),
+      sn(nil, { t '_parent_name = "', i(1, 'parent_id'), t '"' }),
       sn(nil, { t '_parent_store = ', i(1, 'False') }),
     }),
   })
