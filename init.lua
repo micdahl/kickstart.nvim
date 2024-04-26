@@ -192,6 +192,12 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+vim.keymap.set('n', '<leader>pv', vim.cmd.Ex, { desc = '[P]ath [V]iew' })
+vim.keymap.set('n', '<leader>gs', vim.cmd.Git, { desc = '[G]it [S]tatus' })
+vim.keymap.set({ 'n', 'v' }, '<leader>y', [["+y]], { desc = '[Y]ank to clipboard' })
+vim.keymap.set('n', '<leader>Y', [["+Y]], { desc = '[Y]ank to clipboard (line)' })
+vim.keymap.set('n', '<leader>z', vim.cmd.Zen, { desc = '[Z]en Mode' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
@@ -508,11 +514,6 @@ require('lazy').setup({
           --  For example, in C this would take you to the header.
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
-          map('<leader>pv', vim.cmd.Ex, '[P]ath [V]iew')
-          vim.keymap.set('n', '<leader>gs', vim.cmd.Git, { desc = '[G]it [S]tatus' })
-          vim.keymap.set({ 'n', 'v' }, '<leader>y', [["+y]], { buffer = event.buf, desc = 'LSP: ' .. '[Y]ank to clipboard' })
-          map('<leader>Y', [["+Y]], '[Y]ank to clipboard (line)')
-
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
           --    See `:help CursorHold` for information about when this is executed
@@ -766,6 +767,11 @@ require('lazy').setup({
               luasnip.change_choice(1)
             end
           end, { 'i', 's' }),
+          ['<C-u>'] = cmp.mapping(function()
+            if luasnip.choice_active() then
+              require 'luasnip.extras.select_choice'()
+            end
+          end, { 'i', 's' }),
           -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
           --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
         },
@@ -887,6 +893,7 @@ require('lazy').setup({
   },
 
   { 'christoomey/vim-tmux-navigator' },
+  { 'folke/zen-mode.nvim' },
   { 'mbbill/undotree' },
   { 'tpope/vim-fugitive' },
   { 'tpope/vim-dispatch' },
@@ -950,6 +957,10 @@ require('lazy').setup({
 
 vim.o.grepprg = 'rg --vimgrep --no-heading --smart-case'
 vim.o.grepformat = '%f:%l:%c:%m'
+
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+vim.o.expandtab = true
 
 vim.g.loaded_python3_provider = 0
 -- The line beneath this is called `modeline`. See `:help modeline`
