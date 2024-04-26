@@ -224,6 +224,33 @@ for _, view_type in pairs { 'activity', 'calendar', 'cohort', 'form', 'gant', 'g
       )
     )
   )
+
+  table.insert(
+    snippets,
+    s(
+      ('o' .. view_type .. 'i'),
+      fmt(
+        [[
+          <record id="{modelSnake}_view_{viewType}" model="ir.ui.view">
+              <field name="name">{name}</field>
+              <field name="inherit_id" ref="{inheritId}"/>
+              <field name="model">{modelDot}</field>
+              <field name="arch" type="xml">
+                  {finish}
+              </field>
+          </record>
+          ]],
+        {
+          modelSnake = i(1, 'model_name'),
+          viewType = t { view_type },
+          name = i(2, 'View Name'),
+          inheritId = i(3, 'inherit_id'),
+          modelDot = f(transform_snake_to_dot, { 1 }),
+          finish = i(0),
+        }
+      )
+    )
+  )
 end
 
 table.insert(
@@ -264,7 +291,7 @@ table.insert(
 table.insert(
   snippets,
   s(
-    { trig = 'oformnb', name = 'Form Notebook' },
+    { trig = 'onote', name = 'Form Notebook' },
     fmt(
       [[
     <notebook>
@@ -280,55 +307,48 @@ table.insert(
   )
 )
 
-table.insert(snippets, s({ trig = 'ofield' }, { t '<field name="', i(0, 'field_name'), t '" />' }))
-table.insert(
-  snippets,
-  s({ trig = 'ofattr' }, {
-    c(1, {
-      t 'widget=""',
-      t 'groups=""',
-      t 'on_change=""',
-      t 'attrs=""',
-      t 'domain=""',
-      t 'context=""',
-      t 'placeholder=""',
-      t 'help=""',
-      t 'mode=""',
-      t 'class=""',
-      t 'options=""',
-      t 'filename=""',
-      t 'readonly="1"',
-      t 'requried="1"',
-      t 'nolabel="1"',
-      t 'password="1"',
-    }),
-  })
-)
-
 table.insert(
   snippets,
   s(
-    { trig = 'otree' },
+    { trig = 'osheet', name = 'Form Sheet' },
     fmt(
       [[
-    <record id="{modelSnake}_view_tree" model="ir.ui.view">
-        <field name="name">{name}</field>
-        <field name="model">{modelDot}</field>
-        <field name="arch" type="xml">
-            <tree string="{treeString}">
-                <field name="{finish}" />
-            </tree>
-        </field>
-    </record>]],
-      {
-        modelSnake = i(1, 'model_name'),
-        name = i(2, 'Tree Name'),
-        modelDot = f(transform_snake_to_dot, { 1 }),
-        treeString = i(3, 'Tree String'),
-        finish = i(0),
-      }
+  <sheet>
+      <group>
+          <group>
+              <field name="{finish}" />
+          </group>
+      </group>
+  </sheet>
+]],
+      { finish = i(0) }
     )
   )
+)
+
+table.insert(snippets, s({ trig = 'ofield' }, { t '<field name="', i(0, 'field_name'), t '" />' }))
+table.insert(
+  snippets,
+  s({ trig = 'ofattr', name = 'Field Attributes' }, {
+    c(1, {
+      sn(nil, { t 'widget="', i(1), t '"' }),
+      sn(nil, { t 'groups="', i(1), t '"' }),
+      sn(nil, { t 'on_change="', i(1), t '"' }),
+      sn(nil, { t 'attrs="', i(1), t '"' }),
+      sn(nil, { t 'domain="[', i(1), t ']"' }),
+      sn(nil, { t 'context="{', i(1), t '}"' }),
+      sn(nil, { t 'placeholder="', i(1), t '"' }),
+      sn(nil, { t 'help="', i(1), t '"' }),
+      sn(nil, { t 'mode="', i(1), t '"' }),
+      sn(nil, { t 'class="', i(1), t '"' }),
+      sn(nil, { t 'options="', i(1), t '"' }),
+      sn(nil, { t 'filename="', i(1), t '"' }),
+      sn(nil, { t 'readonly="', i(1, '1'), t '"' }),
+      sn(nil, { t 'requried="', i(1, '1'), t '"' }),
+      sn(nil, { t 'nolabel="', i(1, '1'), t '"' }),
+      sn(nil, { t 'password="', i(1, '1'), t '"' }),
+    }),
+  })
 )
 
 return snippets, autosnippets
